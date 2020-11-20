@@ -1,53 +1,80 @@
 import pygame as pg
-import math
+from pygame.sprite import Sprite, Group
 
-from settings import WIDTH, HEIGHT
+from settings import WIDTH
 
 
-class Ball(pg.sprite.Sprite):
+class Ball(Sprite):
 
     def __init__(self, x, y, radius, color, *groups):
         super(Ball, self).__init__(*groups)
         self.color = color
-        self.speedx = self.speedy = 0
-        self.acc = 0.01  # TODO: шарик ускоряется с каждым столкновением
+        self.speed = 0
+        self.dx = 1
+        self.dy = 1
+        self.acc = 0.015
 
-        self.image = pg.Surface((radius, radius), pg.SRCALPHA)
-        self.image.fill(color)
+        self.image = pg.Surface((pow(2, 1/2) * radius, pow(2, 1/2) * radius))  # вписанный прямоугольник
+        # self.image = pg.Surface((2 * radius, 2 * radius))  # описанный прямоугольник
         self.rect = self.image.get_rect(center=(x, y))
 
-    def collide(self, paddle, blocks):
-        collision = False
+    def _collide_with(self, sprite: Sprite):
+        if self.dx > 0:  # left
+            delta_x = abs(self.rect.right - sprite.rect.left)
+        else:  # right
+            delta_x = abs(self.rect.left - sprite.rect.right)
 
-        # с границами окна
-        if self.rect.x + self.rect.width >= WIDTH or self.rect.x <= 0:
-            self.speedx *= -1
-            collision = True
+        if self.dy > 0:  # top
+            delta_y = abs(self.rect.bottom - sprite.rect.top)
+        else:  # bottom
+            delta_y = abs(self.rect.top - sprite.rect.bottom)
 
-        if self.rect.y <= 0 or self.rect.y + self.rect.height >= HEIGHT:
-            self.speedy *= -1
-            collision = True
+        if abs(delta_x - delta_y) < 8:  # edges
+            self.dx, self.dy = -self.dx, -self.dy
+        elif delta_x > delta_y:  # top, bottom
+            self.dy = -self.dy
+        elif delta_y > delta_x:  # left, right
+            self.dx = -self.dx
 
-        # с доской
+    def _collide(self, paddle: Sprite, blocks: Group) -> tuple[int, int, bool]:
+        paddle_collision = 0
+        block_collision = 0
+        dropped = False
+
+        # with screen edges (пока остановился на такой логике)
+        if self.rect.left <= 0:  # left
+            self.dx = abs(self.dx)
+        elif self.rect.right >= WIDTH:  # right
+            self.dx = -abs(self.dx)
+
+        if self.rect.top <= 0:  # top
+            self.dy = abs(self.dy)
+        elif self.rect.top >= paddle.rect.top:  # bottom, game over
+            dropped = True
+
+        # with paddle
         if pg.sprite.collide_rect(self, paddle):
-            collision = True
-            self.speedy *= -1
+            paddle_collision += 1
+            self._collide_with(paddle)
 
-        # с блоком
+        # with blocks
+        blocks = pg.sprite.spritecollide(self, blocks, dokill=True)
         for block in blocks:
-            if pg.sprite.collide_rect(self, block):
-                collision = True
-                block.kill()
-                self.speedy *= -1
+            block_collision += 1
+            self._collide_with(block)
 
-        if collision and abs(self.speedx) < 15:
-            self.speedx += math.copysign(1, self.speedx) * self.acc
-            self.speedy += math.copysign(1, self.speedy) * self.acc
+        # speed increase
+        if paddle_collision and self.speed < 15:
+            self.speed += self.acc
 
-    def update(self, paddle, blocks):
-        self.collide(paddle, blocks)
-        self.rect.centerx += self.speedx
-        self.rect.centery += self.speedy
+        return paddle_collision, block_collision, dropped
 
-    def draw(self, screen):
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+    def update(self, paddle: Sprite, blocks: Group) -> tuple[int, int, bool]:
+        paddle_collision, block_collision, dropped = self._collide(paddle, blocks)
+        self.rect.centerx += self.speed * self.dx
+        self.rect.centery += self.speed * self.dy
+        return paddle_collision, block_collision, dropped
+
+    def draw(self, surface):
+        pg.draw.circle(surface, self.color, (self.rect.centerx, self.rect.centery), self.rect.height / 2)
+        # screen.blit(self.image, self.rect)

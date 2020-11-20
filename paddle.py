@@ -19,5 +19,5 @@ class Paddle(pg.sprite.Sprite):
         elif self.rect.x + self.rect.width >= WIDTH:
             self.rect.x = WIDTH - self.rect.width
 
-    def draw(self, screen):
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
