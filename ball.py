@@ -14,8 +14,7 @@ class Ball(Sprite):
         self.dy = -1
         self.acc = 0.015
 
-        self.image = pg.Surface((pow(2, 1/2) * radius, pow(2, 1/2) * radius))  # вписанный прямоугольник
-        # self.image = pg.Surface((2 * radius, 2 * radius))  # описанный прямоугольник
+        self.image = pg.Surface((2 * radius, 2 * radius))
         self.rect = self.image.get_rect(center=(x, y))
 
     def _collide_with(self, sprite: Sprite):

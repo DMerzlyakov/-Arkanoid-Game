@@ -30,12 +30,16 @@ class Game:
         paddle_x = self._display.get_width() / 2
         paddle_y = self._display.get_height() - 2 * paddle_height
         paddle_color = (232, 69, 69)
-        self._paddle = Paddle(paddle_x, paddle_y, paddle_width, paddle_height, paddle_color)
+        self._paddle = Paddle(paddle_x,
+                              paddle_y,
+                              paddle_width,
+                              paddle_height,
+                              paddle_color)
 
-        ball_radius = 15
+        ball_radius = 8
         ball_color = (43, 46, 74)
         self._ball = Ball(self._paddle.rect.centerx,
-                          self._paddle.rect.top - ball_radius / pow(2, 1/2),
+                          self._paddle.rect.top - ball_radius,
                           ball_radius,
                           ball_color)
 
