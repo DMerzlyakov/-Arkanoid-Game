@@ -1,20 +1,21 @@
 import pygame as pg
 from pygame.sprite import Sprite, Group
+from pygame import Surface
 
 from settings import WIDTH
 
 
 class Ball(Sprite):
 
-    def __init__(self, x, y, radius, color, *groups):
+    def __init__(self, x: float, y: float, radius: float, color: tuple[int, int, int], *groups: Group):
         super(Ball, self).__init__(*groups)
         self.color = color
         self.speed = 0
         self.dx = 1
         self.dy = -1
-        self.acc = 0.015
+        self.acc = 0.02
 
-        self.image = pg.Surface((2 * radius, 2 * radius))
+        self.image = Surface((2 * radius, 2 * radius))
         self.rect = self.image.get_rect(center=(x, y))
 
     def _collide_with(self, sprite: Sprite):
@@ -40,7 +41,7 @@ class Ball(Sprite):
         block_collision = 0
         dropped = False
 
-        # with screen edges (пока остановился на такой логике)
+        # with screen edges
         if self.rect.left <= 0:  # left
             self.dx = abs(self.dx)
         elif self.rect.right >= WIDTH:  # right
@@ -65,6 +66,7 @@ class Ball(Sprite):
         # speed increase
         if paddle_collision and self.speed < 15:
             self.speed += self.acc
+            self.acc += 0.0025
 
         return paddle_collision, block_collision, dropped
 
@@ -74,6 +76,6 @@ class Ball(Sprite):
         self.rect.centery += self.speed * self.dy
         return paddle_collision, block_collision, dropped
 
-    def draw(self, surface):
+    def draw(self, surface: Surface):
         pg.draw.circle(surface, self.color, (self.rect.centerx, self.rect.centery), self.rect.height / 2)
         # screen.blit(self.image, self.rect)

@@ -1,21 +1,21 @@
 import pygame as pg
-from pygame.sprite import Group
+from pygame.sprite import Sprite, Group
 import random
 
-from settings import WIDTH
+from settings import WIDTH, BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_SPRITES
 
 
-class Block(pg.sprite.Sprite):
-    colors = [(249, 237, 105), (240, 138, 93), (184, 59, 94), (106, 44, 112)]
+class Block(Sprite):
+    sprites = BLOCK_SPRITES
 
-    def __init__(self, x, y, width, height, heath=None, effect=None, *groups):
+    def __init__(self, x: float, y: float, width: int, height: int,
+                 heath: int = None, effect=None, *groups: Group):
         super(Block, self).__init__(*groups)
         self.effect = effect
-        self.health = heath or random.randint(1, len(self.colors))
-        self.color = self.colors[self.health - 1]
+        self.health = heath or random.randint(1, len(self.sprites))
+        self.sprite = self.sprites[self.health - 1]
 
-        self.image = pg.Surface((width, height))
-        self.image.fill(self.color)
+        self.image = pg.transform.scale(pg.image.load(self.sprite), (width, height)).convert()
         self.rect = self.image.get_rect(center=(x, y))
 
     def kill(self):
@@ -24,15 +24,17 @@ class Block(pg.sprite.Sprite):
             super(Block, self).kill()
 
     def update(self):
-        self.color = self.colors[self.health - 1]
-        self.image.fill(self.color)
+        pass
+        self.sprite = self.sprites[self.health - 1]
+        self.image = pg.transform.scale(pg.image.load(self.sprite), (self.rect.width, self.rect.height)).convert()
+        self.rect = self.image.get_rect(center=(self.rect.centerx, self.rect.centery))
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
 
 
-def add_row_blocks(blocks: Group) -> None:
-    space = 5
+def add_row_blocks(blocks: Group):
+    space = 10
     block_list = blocks.sprites()
 
     if block_list:
@@ -42,10 +44,10 @@ def add_row_blocks(blocks: Group) -> None:
         for block in block_list:
             block.rect.centery += space + height
     else:
-        width = 50
-        height = 15
+        width = BLOCK_WIDTH
+        height = BLOCK_HEIGHT
 
-    count = WIDTH // (width + 2 * space)
+    count = WIDTH // (width + space)
     delta = (WIDTH - count * (width + space)) // 2
 
     for i in range(count):
