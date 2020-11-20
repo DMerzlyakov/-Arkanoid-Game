@@ -1,7 +1,7 @@
 import pygame as pg
 from pygame import Surface
 from pygame.time import Clock
-from pygame.event import Event
+from pygame.event import EventType
 from pygame.sprite import Group
 
 from paddle import Paddle
@@ -37,7 +37,7 @@ class Game:
         self._display = pg.display.set_mode((width, height))
         pg.display.set_caption("Arkanoid")
 
-        self._clock = pg.time.Clock()
+        self._clock = Clock()
         self._fps = fps
 
         self._init_objects()
@@ -70,12 +70,12 @@ class Game:
                           ball_radius,
                           ball_color)
 
-        self._blocks = pg.sprite.Group()
+        self._blocks = Group()
         [add_row_blocks(self._blocks) for _ in range(4)]
 
         self._score = Score(SCORE_FONT, int(self._display.get_width() / 2), SCORE_COLOR)
 
-    def on_event(self, event: Event):
+    def on_event(self, event: EventType):
         if event.type == pg.QUIT:
             self._running = False
 
