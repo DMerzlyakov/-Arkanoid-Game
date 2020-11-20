@@ -1,4 +1,5 @@
 import pygame as pg
+from pygame.sprite import Group
 import random
 
 from settings import WIDTH
@@ -30,14 +31,23 @@ class Block(pg.sprite.Sprite):
         surface.blit(self.image, self.rect)
 
 
-def create_blocks(width=40, height=15, space=5, rows=6):
-    blocks = []
-    count = WIDTH // (width + space)
-    delta = (WIDTH - count * (width + space)) // 2
-    for i in range(rows):
-        for j in range(count):
-            x = delta + (j * (space + width) + width / 2 + space)
-            y = space + (i * (space + height) + height / 2 + space)
-            blocks.append(Block(x, y, width, height))
+def add_row_blocks(blocks: Group) -> None:
+    space = 5
+    block_list = blocks.sprites()
 
-    return blocks
+    if block_list:
+        width = block_list[0].rect.width
+        height = block_list[0].rect.height
+
+        for block in block_list:
+            block.rect.centery += space + height
+    else:
+        width = 50
+        height = 15
+
+    count = WIDTH // (width + 2 * space)
+    delta = (WIDTH - count * (width + space)) // 2
+
+    for i in range(count):
+        x = delta + (i * (space + width) + width / 2 + space)
+        blocks.add(Block(x, space * 2, width, height))

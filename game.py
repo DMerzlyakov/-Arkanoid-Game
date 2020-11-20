@@ -1,7 +1,9 @@
 import pygame as pg
+
 from paddle import Paddle
 from ball import Ball
-from block import Block, create_blocks
+from block import Block, add_row_blocks
+from score import Score
 
 from settings import WIDTH, HEIGHT, FPS
 
@@ -20,6 +22,8 @@ class Game:
         self._pause = True
         self._game_over = False
         self._start_speed = 2.1
+        self._limit = sum([block.health for block in self._blocks.sprites()])
+        self._complexity = 0.8
         self._counter = 0
 
         self._running = True
@@ -43,23 +47,10 @@ class Game:
                           ball_radius,
                           ball_color)
 
-        self._blocks = pg.sprite.Group(*create_blocks())
-        self._score = 0  # TODO: объект
+        self._blocks = pg.sprite.Group()
+        [add_row_blocks(self._blocks) for _ in range(5)]
 
-    def on_game(self):
-        self._paddle.update()
-        paddle_collision, block_collision, game_over = self._ball.update(self._paddle, self._blocks)
-        self._blocks.update()
-        self._score += block_collision  # TODO: метод update
-
-        self._counter += paddle_collision
-        self._game_over = game_over
-
-    def on_pause(self):
-        pass
-
-    def on_game_over(self):
-        pass
+        self._score = Score('Comic Sans MS', int(self._display.get_width() / 1.2), (245, 245, 245))
 
     def on_event(self, event):
         if event.type == pg.QUIT:
@@ -73,23 +64,41 @@ class Game:
 
     def on_loop(self):
         if not self._pause:
-            self.on_game()
+            self._paddle.update()
+            paddle_collision, block_collision, self._game_over = self._ball.update(self._paddle, self._blocks)
+            self._blocks.update()
+            self._score.update(block_collision)
+
+            self._counter += paddle_collision
+            if self._counter > self._limit * self._complexity:
+                add_row_blocks(self._blocks)
+                self._limit = sum([block.health for block in self._blocks.sprites()])
+                self._complexity -= 0.05
+                self._counter = 0
 
         if self._pause:
-            self.on_pause()
+            pass
 
         if self._game_over:
-            self.on_game_over()
+            pass
 
     def on_render(self):
-        self._display.fill((255, 255, 255))
+        if not self._pause:
+            self._display.fill((255, 255, 255))
 
-        self._paddle.draw(self._display)
-        self._ball.draw(self._display)
-        self._blocks.draw(self._display)
+            self._score.draw(self._display)
+            self._paddle.draw(self._display)
+            self._ball.draw(self._display)
+            self._blocks.draw(self._display)
 
-        pg.display.update()
-        self._clock.tick(self._fps)
+            pg.display.flip()
+            self._clock.tick(self._fps)
+
+        if self._pause:
+            pass
+
+        if self._game_over:
+            pass
 
     def on_cleanup(self):
         pg.quit()
