@@ -1,4 +1,5 @@
 import pygame as pg
+from pygame import Rect, Surface
 from pygame.sprite import Sprite, Group
 import random
 
@@ -6,7 +7,13 @@ from settings import WIDTH, BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_SPRITES
 
 
 class Block(Sprite):
-    sprites = BLOCK_SPRITES
+    sprites: list[str] = BLOCK_SPRITES
+
+    # effect = None
+    health: int = None
+    sprite: str = None
+    image: Surface = None
+    rect: Rect = None
 
     def __init__(self, x: float, y: float, width: int, height: int,
                  heath: int = None, effect=None, *groups: Group):

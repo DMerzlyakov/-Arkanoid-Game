@@ -1,11 +1,13 @@
 import pygame as pg
+from pygame import Rect, Surface
 from pygame.sprite import Sprite, Group
-from pygame import Surface
 
 from settings import WIDTH
 
 
 class Paddle(Sprite):
+    image: Surface = None
+    rect: Rect = None
 
     def __init__(self, x: float, y: float, width: float, height: float,
                  color: tuple[int, int, int], *groups: Group):

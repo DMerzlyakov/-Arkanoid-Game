@@ -1,5 +1,8 @@
 import pygame as pg
+from pygame import Surface
+from pygame.time import Clock
 from pygame.event import Event
+from pygame.sprite import Group
 
 from paddle import Paddle
 from ball import Ball
@@ -11,6 +14,24 @@ from settings import WIDTH, HEIGHT, FPS, PADDLE_HEIGHT, PADDLE_COLOR,\
 
 
 class Game:
+    _display: Surface = None
+    _clock: Clock = None
+    _fps: int = None
+
+    _pause: bool = None
+    _game_over: bool = None
+    _start_speed: float = None
+    _limit: int = None
+    _complexity: float = None
+    _counter: int = None
+
+    _paddle: Paddle = None
+    _ball: Ball = None
+    _blocks: Group = None
+    _score: Score = None
+
+    _running: bool = None
+
     def __init__(self, width: int, height: int, fps: int):
         pg.init()
         self._display = pg.display.set_mode((width, height))

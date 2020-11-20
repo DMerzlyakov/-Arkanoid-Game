@@ -1,11 +1,18 @@
 import pygame as pg
+from pygame import Surface, Rect
 from pygame.sprite import Sprite, Group
-from pygame import Surface
 
 from settings import WIDTH
 
 
 class Ball(Sprite):
+    color: tuple[int, int, int] = None
+    speed: float = None
+    dx: int = None
+    dy: int = None
+    acc: float = None
+    image: Surface = None
+    rect: Rect = None
 
     def __init__(self, x: float, y: float, radius: float, color: tuple[int, int, int], *groups: Group):
         super(Ball, self).__init__(*groups)
