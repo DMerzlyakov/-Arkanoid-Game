@@ -17,6 +17,7 @@ class Block(Sprite):
 
     def __init__(self, x: float, y: float, width: int, height: int,
                  heath: int = None, effect=None, *groups: Group):
+
         super(Block, self).__init__(*groups)
         self.effect = effect
         self.health = heath or random.randint(1, len(self.sprites))
@@ -31,7 +32,6 @@ class Block(Sprite):
             super(Block, self).kill()
 
     def update(self):
-        pass
         self.sprite = self.sprites[self.health - 1]
         self.image = pg.transform.scale(pg.image.load(self.sprite), (self.rect.width, self.rect.height)).convert()
         self.rect = self.image.get_rect(center=(self.rect.centerx, self.rect.centery))
