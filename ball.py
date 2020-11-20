@@ -11,7 +11,7 @@ class Ball(Sprite):
         self.color = color
         self.speed = 0
         self.dx = 1
-        self.dy = 1
+        self.dy = -1
         self.acc = 0.015
 
         self.image = pg.Surface((pow(2, 1/2) * radius, pow(2, 1/2) * radius))  # вписанный прямоугольник
