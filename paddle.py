@@ -6,8 +6,11 @@ from settings import WIDTH
 
 
 class Paddle(Sprite):
-    image: Surface = None
-    rect: Rect = None
+    """
+    Создает объект платформы
+    """
+    image: Surface = None  # поверхность, на которой отрисована платформа
+    rect: Rect = None  # объект с размерами и координатами поверхности
 
     def __init__(self, x: float, y: float, width: float, height: float,
                  color: tuple[int, int, int], *groups: Group):
@@ -18,7 +21,7 @@ class Paddle(Sprite):
         self.rect = self.image.get_rect(center=(x, y))
 
     def update(self):
-        self.rect.centerx = pg.mouse.get_pos()[0]
+        self.rect.centerx = pg.mouse.get_pos()[0]  # расположение зависит от положения курсора мыши
 
         if self.rect.x <= 0:
             self.rect.x = 0

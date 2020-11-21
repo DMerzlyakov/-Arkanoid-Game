@@ -6,13 +6,16 @@ from settings import WIDTH
 
 
 class Ball(Sprite):
-    color: tuple[int, int, int] = None
-    speed: float = None
-    dx: int = None
-    dy: int = None
-    acc: float = None
-    image: Surface = None
-    rect: Rect = None
+    """
+    Создает объект шарика
+    """
+    color: tuple[int, int, int] = None  # цвет
+    speed: float = None  # скорость движения
+    dx: int = None  # направление скорости по x
+    dy: int = None  # направление скорости по y
+    acc: float = None  # ускорение
+    image: Surface = None  # поверхность, на которой отрисован шарик
+    rect: Rect = None  # объект с размерами и координатами поверхности
 
     def __init__(self, x: float, y: float, radius: float, color: tuple[int, int, int], *groups: Group):
         super(Ball, self).__init__(*groups)
@@ -26,51 +29,58 @@ class Ball(Sprite):
         self.rect = self.image.get_rect(center=(x, y))
 
     def _collide_with(self, sprite: Sprite):
-        if self.dx > 0:  # left
+        """
+        Изменяет направление движения шарика
+        после столкновения
+        """
+        if self.dx > 0:  # правым ребром
             delta_x = abs(self.rect.right - sprite.rect.left)
-        else:  # right
+        else:  # левым ребром
             delta_x = abs(self.rect.left - sprite.rect.right)
 
-        if self.dy > 0:  # top
+        if self.dy > 0:  # нижним ребром
             delta_y = abs(self.rect.bottom - sprite.rect.top)
-        else:  # bottom
+        else:  # верхним ребром
             delta_y = abs(self.rect.top - sprite.rect.bottom)
 
-        if abs(delta_x - delta_y) < 8:  # edges
+        if abs(delta_x - delta_y) < 8:  # края
             self.dx, self.dy = -self.dx, -self.dy
-        elif delta_x > delta_y:  # top, bottom
+        elif delta_x > delta_y:  # верх, низ
             self.dy = -self.dy
-        elif delta_y > delta_x:  # left, right
+        elif delta_y > delta_x:  # лево, право
             self.dx = -self.dx
 
     def _collide(self, paddle: Sprite, blocks: Group) -> tuple[int, int, bool]:
-        paddle_collision = 0
-        block_collision = 0
-        dropped = False
+        """
+        Обрабатывает столкновения шарика
+        """
+        paddle_collision = 0  # кол-во столкновений с платформой (1 или 0)
+        block_collision = 0  # кол-во столкновений с блоками
+        dropped = False  # выход за границы игрового поля
 
-        # with screen edges
-        if self.rect.left <= 0:  # left
+        # с краями экрана
+        if self.rect.left <= 0:  # левый
             self.dx = abs(self.dx)
-        elif self.rect.right >= WIDTH:  # right
+        elif self.rect.right >= WIDTH:  # правый
             self.dx = -abs(self.dx)
 
-        if self.rect.top <= 0:  # top
+        if self.rect.top <= 0:  # верхний
             self.dy = abs(self.dy)
-        elif self.rect.top >= paddle.rect.top:  # bottom, game over
+        elif self.rect.top >= paddle.rect.top:  # нижний, окончание игры
             dropped = True
 
-        # with paddle
+        # с платформой
         if pg.sprite.collide_rect(self, paddle):
             paddle_collision += 1
             self._collide_with(paddle)
 
-        # with blocks
+        # с блоками
         blocks = pg.sprite.spritecollide(self, blocks, dokill=True)
         for block in blocks:
             block_collision += 1
             self._collide_with(block)
 
-        # speed increase
+        # увеличение скорости
         if paddle_collision and self.speed < 15:
             self.speed += self.acc
             self.acc += 0.0025
@@ -84,5 +94,6 @@ class Ball(Sprite):
         return paddle_collision, block_collision, dropped
 
     def draw(self, surface: Surface):
+        # пока используется круг для изоображения шарика
         pg.draw.circle(surface, self.color, (self.rect.centerx, self.rect.centery), self.rect.height / 2)
         # screen.blit(self.image, self.rect)

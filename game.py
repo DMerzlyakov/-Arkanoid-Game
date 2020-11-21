@@ -14,23 +14,23 @@ from settings import WIDTH, HEIGHT, FPS, PADDLE_HEIGHT, PADDLE_COLOR,\
 
 
 class Game:
-    _display: Surface = None
-    _clock: Clock = None
-    _fps: int = None
+    _display: Surface = None  # игровое окно
+    _clock: Clock = None  # объект, отвечающий за частоту обновления окна
+    _fps: int = None  # кол-во кадров в секунду
 
-    _pause: bool = None
-    _game_over: bool = None
-    _start_speed: float = None
-    _limit: int = None
-    _complexity: float = None
-    _counter: int = None
+    _pause: bool = None  # игра на паузе или нет
+    _game_over: bool = None  # игра закончилась или нет
+    _start_speed: float = None  # начальная скорость шарика
+    _limit: int = None  # кол-во столкновений шарика с платформой, после которого происходит добавление ряда блоков
+    _complexity: float = None  # сложность игры, чем меньше, тем чаще добавляются ряды блоков
+    _counter: int = None  # счетчик столкновений шарика с платформой
 
-    _paddle: Paddle = None
-    _ball: Ball = None
-    _blocks: Group = None
-    _score: Score = None
+    _paddle: Paddle = None  # объект платформы
+    _ball: Ball = None  # объект шарика
+    _blocks: Group = None  # группа объектов блоков
+    _score: Score = None  # объект счета
 
-    _running: bool = None
+    _running: bool = None  # глобальный игровой цикл
 
     def __init__(self, width: int, height: int, fps: int):
         pg.init()
@@ -52,6 +52,9 @@ class Game:
         self._running = True
 
     def _init_objects(self):
+        """
+        Инициализирует все игровые объекты
+        """
         paddle_width = self._display.get_width() // 5
         paddle_height = PADDLE_HEIGHT
         paddle_x = self._display.get_width() / 2
@@ -71,27 +74,34 @@ class Game:
                           ball_color)
 
         self._blocks = Group()
-        [add_row_blocks(self._blocks) for _ in range(4)]
+        [add_row_blocks(self._blocks) for _ in range(4)]  # инициализируем четыре ряда блоков
 
         self._score = Score(SCORE_FONT, int(self._display.get_width() / 2), SCORE_COLOR)
 
     def on_event(self, event: EventType):
+        """
+        Обрабатывает пользовательский ввод
+        """
         if event.type == pg.QUIT:
             self._running = False
 
         if event.type == pg.KEYDOWN:
 
-            if event.key == pg.K_RETURN and self._pause:
+            if event.key == pg.K_RETURN and self._pause:  # снять паузу по клавише Enter
                 self._ball.speed = self._start_speed
                 self._pause = False
 
     def on_loop(self):
+        """
+        Обновляет состояния игровых объектов
+        """
         if not self._pause:
             self._paddle.update()
             paddle_collision, block_collision, self._game_over = self._ball.update(self._paddle, self._blocks)
             self._blocks.update()
             self._score.update(block_collision)
 
+            # добавляем новый ряд блоков
             self._counter += paddle_collision
             if self._counter > self._limit * self._complexity or len(self._blocks.sprites()) < 4:
                 add_row_blocks(self._blocks)
@@ -109,6 +119,9 @@ class Game:
             pass
 
     def on_render(self):
+        """
+        Отрисовывает все игровые объекты
+        """
         # if not self._pause:
         self._display.fill((3, 3, 3))
 
@@ -127,6 +140,9 @@ class Game:
             pass
 
     def on_cleanup(self):
+        """
+        Завершает работу игры
+        """
         pg.quit()
 
     def on_execute(self):

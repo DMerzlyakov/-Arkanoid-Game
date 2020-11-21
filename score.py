@@ -7,14 +7,17 @@ from settings import WIDTH, HEIGHT
 
 
 class Score(Sprite):
-    counter: int = None
-    num: int = None
-    font: str = None
-    size: int = None
-    color: tuple[int, int, int] = None
-    text: Font = None
-    image: Surface = None
-    rect: Rect = None
+    """
+    Создает объект счета игры
+    """
+    counter: int = None  # внутренний счетчик
+    num: int = None  # кол-во разрядов счетчика
+    font: str = None  # путь к файлу с шрифтом
+    size: int = None  # размер шрифта
+    color: tuple[int, int, int] = None  # цвет шрифта
+    text: Font = None  # объект шрифта определнного размера
+    image: Surface = None  # поверхность, содержащая текст
+    rect: Rect = None  # объект с размерами поверхности
 
     def __init__(self, font: str, size: int, color: tuple[int, int, int], *groups: Group):
         super(Score, self).__init__(*groups)
@@ -31,7 +34,7 @@ class Score(Sprite):
 
     def update(self, num: int):
         self.counter += num
-        if self.num != len(str(self.counter)):
+        if self.num != len(str(self.counter)):  # масштабирование шрифта при увеличении разрядности счетчика
             self.num = len(str(self.counter))
             size = int(self.size / (self.num / 2))
             self.text = Font(self.font, size)
