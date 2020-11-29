@@ -32,4 +32,5 @@ START_TEXT = "Press Enter to start"
 
 # end game
 END_FONT = "fonts/19783.ttf"
-END_TEXT = "Game End"
+LOSE_TEXT = "You lose"
+WIN_TEXT = "You win!"

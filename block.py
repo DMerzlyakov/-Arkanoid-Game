@@ -10,7 +10,7 @@ class Block(Sprite):
     """
     Создает объект блока
     """
-    sprites: [str] = BLOCK_SPRITES # спрайты для блоков с различным количеством hp
+    sprites: [str] = BLOCK_SPRITES  # спрайты для блоков с различным количеством hp
 
 
     # effect = None

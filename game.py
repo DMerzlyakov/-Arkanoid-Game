@@ -25,6 +25,7 @@ class Game:
     _limit: int = None  # кол-во столкновений шарика с платформой, после которого происходит добавление ряда блоков
     _complexity: float = None  # сложность игры, чем меньше, тем чаще добавляются ряды блоков
     _counter: int = None  # счетчик столкновений шарика с платформой
+    _game_win: bool = None
 
     _paddle: Paddle = None  # объект платформы
     _ball: Ball = None  # объект шарика
@@ -43,10 +44,11 @@ class Game:
 
         self._init_objects()
 
+        self._game_win = False
         self._start_game = False
         self._pause = True
         self._game_over = False
-        self._start_speed = 5
+        self._start_speed = 8
         self._limit = sum([block.health for block in self._blocks.sprites()])
         self._complexity = 0.5
         self._counter = 0
@@ -119,6 +121,8 @@ class Game:
                 elif self._complexity > 0.04:
                     self._complexity -= 0.02
 
+            if len(self._blocks) == 0:
+                self._game_win = True
         if self._pause:
             pass
         if self._game_over:
@@ -159,13 +163,23 @@ class Game:
             self._display.fill((3, 3, 3))
             pg.font.init()
             text = Font(END_FONT, int(self._display.get_width() / 4))
-            image = text.render(END_TEXT, True, (255, 255, 255))
+            image = text.render(LOSE_TEXT, True, (255, 255, 255))
             rect = image.get_rect(center=(WIDTH / 2, HEIGHT / 2))
             # text_2 = Font("fonts/19783.ttf", int(self._display.get_width() / 10))
             # image_2 = text_2.render("Press Space to new game", True, (97, 97, 97))
             # rect_2 = image_2.get_rect(center=(WIDTH / 2, HEIGHT*2 / 3))
             self._display.blit(image, rect)
             # self._display.blit(image_2, rect_2)
+            self._clock.tick(self._fps)
+            pg.display.flip()
+
+        if self._game_win and self._running:
+            self._display.fill((3, 3, 3))
+            pg.font.init()
+            text = Font(END_FONT, int(self._display.get_width() / 4))
+            image = text.render(WIN_TEXT, True, (255, 255, 255))
+            rect = image.get_rect(center=(WIDTH / 2, HEIGHT / 2))
+            self._display.blit(image, rect)
             self._clock.tick(self._fps)
             pg.display.flip()
 
