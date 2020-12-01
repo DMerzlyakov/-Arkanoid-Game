@@ -22,3 +22,23 @@ BALL_SPRITE = ""
 # score
 SCORE_FONT = "fonts/19355.ttf"
 SCORE_COLOR = (10, 10, 10)
+<<<<<<< Updated upstream
+=======
+
+# pause
+PAUSE_SPRITES = "sprites/pause_with_rules.png"
+
+# start game
+START_FONT = "fonts/19783.ttf"
+START_TEXT = "Press Enter to start"
+
+# end game
+END_FONT = "fonts/19783.ttf"
+END_TEXT = "Game End"
+END_TEXT_2 = "Press Space to start new game"
+
+
+# rules
+RULES_SPRITE = "sprites/rules.png"
+
+>>>>>>> Stashed changes

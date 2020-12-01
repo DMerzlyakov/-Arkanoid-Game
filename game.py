@@ -18,6 +18,11 @@ class Game:
     _clock: Clock = None  # объект, отвечающий за частоту обновления окна
     _fps: int = None  # кол-во кадров в секунду
 
+<<<<<<< Updated upstream
+=======
+    _restart: bool = None # статус перезапуска игры после окончания
+    _start_game: bool = None  # Игра только запустилась или нет
+>>>>>>> Stashed changes
     _pause: bool = None  # игра на паузе или нет
     _game_over: bool = None  # игра закончилась или нет
     _start_speed: float = None  # начальная скорость шарика
@@ -42,9 +47,17 @@ class Game:
 
         self._init_objects()
 
+<<<<<<< Updated upstream
         self._pause = True
         self._game_over = False
         self._start_speed = 2.2
+=======
+        self._restart = False
+        self._start_game = False
+        self._pause = True
+        self._game_over = False
+        self._start_speed = 5
+>>>>>>> Stashed changes
         self._limit = sum([block.health for block in self._blocks.sprites()])
         self._complexity = 0.5
         self._counter = 0
@@ -75,8 +88,12 @@ class Game:
 
         self._blocks = Group()
         [add_row_blocks(self._blocks) for _ in range(4)]  # инициализируем четыре ряда блоков
+<<<<<<< Updated upstream
 
         self._score = Score(SCORE_FONT, int(self._display.get_width() / 2), SCORE_COLOR)
+=======
+        self._score = Score(SCORE_FONT, int(self._display.get_width() / 3), SCORE_COLOR)
+>>>>>>> Stashed changes
 
     def on_event(self, event: EventType):
         """
@@ -90,6 +107,14 @@ class Game:
             if event.key == pg.K_RETURN and self._pause:  # снять паузу по клавише Enter
                 self._ball.speed = self._start_speed
                 self._pause = False
+<<<<<<< Updated upstream
+=======
+                self._start_game = True
+            elif event.key == pg.K_RETURN and not self._pause:  # поставить паузу по клавише Enter
+                self._pause = True
+            elif event.key == pg.K_SPACE and self._game_over:  # Подумать над рестартом игры
+                self._restart = True
+>>>>>>> Stashed changes
 
     def on_loop(self):
         """
@@ -104,6 +129,7 @@ class Game:
             # добавляем новый ряд блоков
             self._counter += paddle_collision
             if self._counter > self._limit * self._complexity or len(self._blocks.sprites()) < 4:
+
                 add_row_blocks(self._blocks)
                 self._limit = sum([block.health for block in self._blocks.sprites()])
                 self._counter = 0
@@ -112,6 +138,11 @@ class Game:
                 elif self._complexity > 0.04:
                     self._complexity -= 0.02
 
+<<<<<<< Updated upstream
+=======
+            if len(self._blocks) >= 144:
+                self._game_over = True
+>>>>>>> Stashed changes
         if self._pause:
             pass
 
@@ -122,6 +153,7 @@ class Game:
         """
         Отрисовывает все игровые объекты
         """
+<<<<<<< Updated upstream
         # if not self._pause:
         self._display.fill((3, 3, 3))
 
@@ -138,6 +170,52 @@ class Game:
 
         if self._game_over:
             pass
+=======
+        if not self._start_game:
+            pg.font.init()
+            text = Font(START_FONT, int(self._display.get_width() / 7))
+            image = text.render(START_TEXT, True, (255, 255, 255))
+            rect = image.get_rect(center=(WIDTH / 2 , HEIGHT / 2 - 50))
+            self._display.blit(image, rect)
+            image = pg.transform.scale(pg.image.load(RULES_SPRITE), (743, 196)).convert()
+            image.set_alpha(2)
+            rect = image.get_rect(center=(400, 500))
+            self._display.blit(image, rect)
+            pg.display.flip()
+
+        if not self._pause and not self._game_over:
+            self._display.fill((3, 3, 3))
+
+            self._score.draw(self._display)
+            self._paddle.draw(self._display)
+            self._ball.draw(self._display)
+            self._blocks.draw(self._display)
+
+            pg.display.flip()
+            self._clock.tick(self._fps)
+
+        if self._pause and self._start_game and not self._game_over:
+            image = pg.transform.scale(pg.image.load(PAUSE_SPRITES), (800, 600)).convert()
+            image.set_alpha(5)
+            rect = image.get_rect(center=(400, 300))
+            self._display.blit(image, rect)
+            pg.display.flip()
+            self._clock.tick(self._fps)
+
+        if self._game_over and self._running:
+            self._display.fill((3, 3, 3))
+            pg.font.init()
+            text = Font(END_FONT, int(self._display.get_width() / 4))
+            image = text.render(END_TEXT, True, (255, 255, 255))
+            rect = image.get_rect(center=(WIDTH / 2, HEIGHT / 2))
+            text_2 = Font("fonts/19783.ttf", int(self._display.get_width() / 10))
+            image_2 = text_2.render(END_TEXT_2, True, (97, 97, 97))
+            rect_2 = image_2.get_rect(center=(WIDTH / 2, HEIGHT*2 / 3))
+            self._display.blit(image, rect)
+            self._display.blit(image_2, rect_2)
+            self._clock.tick(self._fps)
+            pg.display.flip()
+>>>>>>> Stashed changes
 
     def on_cleanup(self):
         """
@@ -146,7 +224,7 @@ class Game:
         pg.quit()
 
     def on_execute(self):
-        while self._running:
+        while self._running and not self._restart:
             for event in pg.event.get():
                 self.on_event(event)
 
@@ -154,6 +232,10 @@ class Game:
             self.on_render()
 
         self.on_cleanup()
+
+        if self._restart:
+            game = Game(WIDTH, HEIGHT, FPS)
+            game.on_execute()
 
 
 if __name__ == '__main__':
