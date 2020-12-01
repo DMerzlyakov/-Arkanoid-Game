@@ -2,7 +2,7 @@ import pygame as pg
 from pygame import Rect, Surface
 from pygame.sprite import Sprite, Group
 
-from settings import WIDTH
+from settings import WIDTH, PADDlE_SPRITE
 
 
 class Paddle(Sprite):
@@ -11,13 +11,15 @@ class Paddle(Sprite):
     """
     image: Surface = None  # поверхность, на которой отрисована платформа
     rect: Rect = None  # объект с размерами и координатами поверхности
+    sprite: str = PADDlE_SPRITE
+    color: (int, int, int) = None  # цвет
 
     def __init__(self, x: float, y: float, width: float, height: float,
-                 color: tuple[int, int, int], *groups: Group):
+                 color: (int, int, int), *groups: Group):
 
         super(Paddle, self).__init__(*groups)
-        self.image = Surface((width, height))
-        self.image.fill(color)
+        self.color = color
+        self.image = pg.transform.scale(pg.image.load(self.sprite), (width, height)).convert()
         self.rect = self.image.get_rect(center=(x, y))
 
     def update(self):

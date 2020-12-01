@@ -12,21 +12,19 @@ BLOCK_SPRITES = ["sprites/block_1.png", "sprites/block_2.png", "sprites/block_3.
 # paddle
 PADDLE_HEIGHT = 15
 PADDLE_COLOR = (255, 30, 30)
-BLOCK_SPRITE = ""
+PADDlE_SPRITE = "sprites/paddle.png"
 
 # ball
 BALL_RADIUS = 8
 BALL_COLOR = (20, 240, 240)
-BALL_SPRITE = ""
+BALL_SPRITE = "sprites/ball_yellow.png"
 
 # score
 SCORE_FONT = "fonts/19355.ttf"
 SCORE_COLOR = (10, 10, 10)
-<<<<<<< Updated upstream
-=======
 
 # pause
-PAUSE_SPRITES = "sprites/pause_with_rules.png"
+PAUSE_SPRITES = "sprites/pause.png"
 
 # start game
 START_FONT = "fonts/19783.ttf"
@@ -34,11 +32,5 @@ START_TEXT = "Press Enter to start"
 
 # end game
 END_FONT = "fonts/19783.ttf"
-END_TEXT = "Game End"
-END_TEXT_2 = "Press Space to start new game"
-
-
-# rules
-RULES_SPRITE = "sprites/rules.png"
-
->>>>>>> Stashed changes
+LOSE_TEXT = "You lose"
+WIN_TEXT = "You win!"

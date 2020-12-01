@@ -2,14 +2,15 @@ import pygame as pg
 from pygame import Surface, Rect
 from pygame.sprite import Sprite, Group
 
-from settings import WIDTH
-
+from settings import WIDTH, BALL_SPRITE
 
 class Ball(Sprite):
     """
     Создает объект шарика
     """
-    color: tuple[int, int, int] = None  # цвет
+    sprite: str = BALL_SPRITE
+
+    color: (int, int, int) = None  # цвет
     speed: float = None  # скорость движения
     dx: int = None  # направление скорости по x
     dy: int = None  # направление скорости по y
@@ -17,15 +18,14 @@ class Ball(Sprite):
     image: Surface = None  # поверхность, на которой отрисован шарик
     rect: Rect = None  # объект с размерами и координатами поверхности
 
-    def __init__(self, x: float, y: float, radius: float, color: tuple[int, int, int], *groups: Group):
+    def __init__(self, x: float, y: float, radius: float, color: (int, int, int), *groups: Group):
         super(Ball, self).__init__(*groups)
         self.color = color
         self.speed = 0
         self.dx = 1
         self.dy = -1
         self.acc = 0.02
-
-        self.image = Surface((2 * radius, 2 * radius))
+        self.image = pg.transform.scale(pg.image.load(self.sprite), (2 * radius, 2 * radius)).convert()
         self.rect = self.image.get_rect(center=(x, y))
 
     def _collide_with(self, sprite: Sprite):
@@ -50,7 +50,7 @@ class Ball(Sprite):
         elif delta_y > delta_x:  # лево, право
             self.dx = -self.dx
 
-    def _collide(self, paddle: Sprite, blocks: Group) -> tuple[int, int, bool]:
+    def _collide(self, paddle: Sprite, blocks: Group) -> (int, int, bool):
         """
         Обрабатывает столкновения шарика
         """
@@ -87,7 +87,7 @@ class Ball(Sprite):
 
         return paddle_collision, block_collision, dropped
 
-    def update(self, paddle: Sprite, blocks: Group) -> tuple[int, int, bool]:
+    def update(self, paddle: Sprite, blocks: Group) -> (int, int, bool):
         paddle_collision, block_collision, dropped = self._collide(paddle, blocks)
         self.rect.centerx += self.speed * self.dx
         self.rect.centery += self.speed * self.dy
@@ -95,5 +95,5 @@ class Ball(Sprite):
 
     def draw(self, surface: Surface):
         # пока используется круг для изоображения шарика
-        pg.draw.circle(surface, self.color, (self.rect.centerx, self.rect.centery), self.rect.height / 2)
-        # screen.blit(self.image, self.rect)
+        # pg.draw.circle(surface, self.color, (self.rect.centerx, self.rect.centery), self.rect.height / 2)
+        surface.blit(self.image, self.rect)

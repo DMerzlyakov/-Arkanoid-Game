@@ -14,12 +14,12 @@ class Score(Sprite):
     num: int = None  # кол-во разрядов счетчика
     font: str = None  # путь к файлу с шрифтом
     size: int = None  # размер шрифта
-    color: tuple[int, int, int] = None  # цвет шрифта
+    color: (int, int, int) = None  # цвет шрифта
     text: Font = None  # объект шрифта определнного размера
     image: Surface = None  # поверхность, содержащая текст
     rect: Rect = None  # объект с размерами поверхности
 
-    def __init__(self, font: str, size: int, color: tuple[int, int, int], *groups: Group):
+    def __init__(self, font: str, size: int, color: (int, int, int), *groups: Group):
         super(Score, self).__init__(*groups)
         self.counter = 0
         self.num = len(str(self.counter))
