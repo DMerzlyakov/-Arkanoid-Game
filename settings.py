@@ -2,6 +2,8 @@
 WIDTH = 800
 HEIGHT = 600
 FPS = 60
+FONT = "fonts/19355.ttf"
+BG_COLOR = (3, 3, 3)
 
 # block
 BLOCK_WIDTH = 75
@@ -20,17 +22,13 @@ BALL_COLOR = (20, 240, 240)
 BALL_SPRITE = "sprites/ball_yellow.png"
 
 # score
-SCORE_FONT = "fonts/19355.ttf"
 SCORE_COLOR = (10, 10, 10)
 
 # pause
-PAUSE_SPRITES = "sprites/pause.png"
+PAUSE_TEXT = "Pause"
 
 # start game
-START_FONT = "fonts/19783.ttf"
-START_TEXT = "Press Enter to start"
+START_TEXT = "Press ENTER to start"
 
 # end game
-END_FONT = "fonts/19783.ttf"
-LOSE_TEXT = "You lose"
-WIN_TEXT = "You win!"
+END_TEXT = "Game over"

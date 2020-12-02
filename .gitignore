@@ -139,9 +139,4 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-.idea/-Arkanoid-Game.iml
-.idea/.gitignore
-.idea/inspectionProfiles/
-.idea/misc.xml
-.idea/modules.xml
-.idea/vcs.xml
+.idea/*

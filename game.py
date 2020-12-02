@@ -2,7 +2,7 @@ import pygame as pg
 from pygame import Surface
 from pygame.font import Font
 from pygame.time import Clock
-from pygame.event import EventType
+from pygame.event import Event
 from pygame.sprite import Group
 
 from paddle import Paddle
@@ -25,7 +25,6 @@ class Game:
     _limit: int = None  # кол-во столкновений шарика с платформой, после которого происходит добавление ряда блоков
     _complexity: float = None  # сложность игры, чем меньше, тем чаще добавляются ряды блоков
     _counter: int = None  # счетчик столкновений шарика с платформой
-    _game_win: bool = None
 
     _paddle: Paddle = None  # объект платформы
     _ball: Ball = None  # объект шарика
@@ -36,6 +35,7 @@ class Game:
 
     def __init__(self, width: int, height: int, fps: int):
         pg.init()
+        pg.font.init()
         self._display = pg.display.set_mode((width, height))
         pg.display.set_caption("Arkanoid")
 
@@ -44,7 +44,6 @@ class Game:
 
         self._init_objects()
 
-        self._game_win = False
         self._start_game = False
         self._pause = True
         self._game_over = False
@@ -80,9 +79,9 @@ class Game:
         self._blocks = Group()
         [add_row_blocks(self._blocks) for _ in range(4)]  # инициализируем четыре ряда блоков
 
-        self._score = Score(SCORE_FONT, int(self._display.get_width() / 3), SCORE_COLOR)
+        self._score = Score(FONT, int(self._display.get_width() / 3), SCORE_COLOR)
 
-    def on_event(self, event: EventType):
+    def on_event(self, event: Event):
         """
         Обрабатывает пользовательский ввод
         """
@@ -97,8 +96,12 @@ class Game:
                 self._start_game = True
             elif event.key == pg.K_RETURN and not self._pause:  # поставить паузу по клавише Enter
                 self._pause = True
-            # elif event.key == pg.K_SPACE and self._game_over:  # Подумать над рестартом игры
-            #     pass
+            elif event.key == pg.K_SPACE and self._game_over:  # рестарт игры по клавише Space
+                pg.display.flip()
+                self._init_objects()
+                self._game_over = False
+                self._start_game = False
+                self._pause = True
 
     def on_loop(self):
         """
@@ -121,8 +124,6 @@ class Game:
                 elif self._complexity > 0.04:
                     self._complexity -= 0.02
 
-            if len(self._blocks) == 0:
-                self._game_win = True
         if self._pause:
             pass
         if self._game_over:
@@ -132,56 +133,126 @@ class Game:
         """
         Отрисовывает все игровые объекты
         """
+        width, height = self._display.get_width(), self._display.get_height()
+
+        # Старт
         if not self._start_game:
-            pg.font.init()
-            text = Font(START_FONT, int(self._display.get_width() / 7))
-            image = text.render(START_TEXT, True, (255, 255, 255))
-            rect = image.get_rect(center=(WIDTH / 2, HEIGHT / 2))
-            self._display.blit(image, rect)
-            pg.display.flip()
+            background = pg.Surface((width, height))
+            background.fill(BG_COLOR)
+            background_rect = background.get_rect(center=(width / 2, height / 2))
 
+            font_color = (255, 255, 255)
+            text = Font(FONT, int(height / 12))
+            start = text.render(START_TEXT, True, font_color)
+            start_rect = start.get_rect(center=background_rect.center)
+
+            text = Font(FONT, int(height / 12))
+            score = text.render(f"ARKANOID    2  0  7  8", True, (234, 236, 35))
+            score_rect = score.get_rect(center=(background_rect.centerx, background_rect.centery - 200))
+
+            text = Font(FONT, int(height / 20))
+            note = text.render("Notes:", True, font_color)
+            note_rect = note.get_rect(center=(background_rect.centerx, background_rect.centery + 150))
+
+            text = Font(FONT, int(height / 50))
+            note1 = text.render("    ".join("- use the mouse to control the paddle".split()),
+                                True, font_color)
+            note1_rect = note1.get_rect(
+                midleft=(score_rect.left, note_rect.centery + note_rect.height + text.get_height()))
+
+            note2 = text.render("    ".join("- press ENTER to pause the game".split()),
+                                True, font_color)
+            note2_rect = note2.get_rect(midleft=(note1_rect.left, note1_rect.centery + 2 * note1_rect.height))
+
+            self._display.blit(background, background_rect)
+            self._display.blit(score, score_rect)
+            self._display.blit(start, start_rect)
+            self._display.blit(note, note_rect)
+            self._display.blit(note1, note1_rect)
+            self._display.blit(note2, note2_rect)
+
+        # Игра
         if not self._pause and not self._game_over:
-            self._display.fill((3, 3, 3))
-
+            self._display.fill(BG_COLOR)
             self._score.draw(self._display)
             self._paddle.draw(self._display)
             self._ball.draw(self._display)
             self._blocks.draw(self._display)
 
-            pg.display.flip()
-            self._clock.tick(self._fps)
-
+        # Пауза
         if self._pause and self._start_game and not self._game_over:
-            image = pg.transform.scale(pg.image.load("sprites/pause.png"), (800, 600)).convert()
-            image.set_alpha(5)
-            rect = image.get_rect(center=(400, 300))
-            self._display.blit(image, rect)
-            pg.display.flip()
-            self._clock.tick(self._fps)
+            background = pg.Surface((width - 50, height - 50))
+            background.fill((55, 55, 55))
+            background.set_alpha(5)
+            background_rect = background.get_rect(center=(width / 2, height / 2))
 
+            font_color = (255, 255, 255)
+            text = Font(FONT, int(height / 6))
+            pause = text.render(PAUSE_TEXT, True, (88, 51, 255))
+            pause_rect = pause.get_rect(center=background_rect.center)
+            
+            text = Font(FONT, int(height / 12))
+            score = text.render(f"Your score:   {self._score.counter}", True, font_color)
+            score_rect = score.get_rect(center=(background_rect.centerx, background_rect.centery - 200))
+
+            text = Font(FONT, int(height / 20))
+            note = text.render("Notes:", True, font_color)
+            note_rect = note.get_rect(center=(background_rect.centerx, background_rect.centery + 150))
+
+            text = Font(FONT, int(height / 50))
+            note1 = text.render("    ".join("- use the mouse to control the paddle".split()),
+                                True, font_color)
+            note1_rect = note1.get_rect(midleft=(score_rect.left, note_rect.centery + note_rect.height + text.get_height()))
+
+            note2 = text.render("    ".join("- press ENTER to unpause the game".split()),
+                                True, font_color)
+            note2_rect = note2.get_rect(midleft=(note1_rect.left, note1_rect.centery + 2 * note1_rect.height))
+
+            self._display.blit(background, background_rect)
+            self._display.blit(score, score_rect)
+            self._display.blit(pause, pause_rect)
+            self._display.blit(note, note_rect)
+            self._display.blit(note1, note1_rect)
+            self._display.blit(note2, note2_rect)
+
+        # Конец игры
         if self._game_over and self._running:
-            self._display.fill((3, 3, 3))
-            pg.font.init()
-            text = Font(END_FONT, int(self._display.get_width() / 4))
-            image = text.render(LOSE_TEXT, True, (255, 255, 255))
-            rect = image.get_rect(center=(WIDTH / 2, HEIGHT / 2))
-            # text_2 = Font("fonts/19783.ttf", int(self._display.get_width() / 10))
-            # image_2 = text_2.render("Press Space to new game", True, (97, 97, 97))
-            # rect_2 = image_2.get_rect(center=(WIDTH / 2, HEIGHT*2 / 3))
-            self._display.blit(image, rect)
-            # self._display.blit(image_2, rect_2)
-            self._clock.tick(self._fps)
-            pg.display.flip()
+            background = pg.Surface((width, height))
+            background.fill(BG_COLOR)
+            background_rect = background.get_rect(center=(width / 2, height / 2))
 
-        if self._game_win and self._running:
-            self._display.fill((3, 3, 3))
-            pg.font.init()
-            text = Font(END_FONT, int(self._display.get_width() / 4))
-            image = text.render(WIN_TEXT, True, (255, 255, 255))
-            rect = image.get_rect(center=(WIDTH / 2, HEIGHT / 2))
-            self._display.blit(image, rect)
-            self._clock.tick(self._fps)
-            pg.display.flip()
+            font_color = (255, 255, 255)
+            text = Font(FONT, int(height / 6))
+            end = text.render(END_TEXT, True, (252, 57, 31))
+            end_rect = end.get_rect(center=background_rect.center)
+
+            text = Font(FONT, int(height / 12))
+            score = text.render(f"Your score:   {self._score.counter}", True, font_color)
+            score_rect = score.get_rect(center=(background_rect.centerx, background_rect.centery - 200))
+
+            text = Font(FONT, int(height / 20))
+            note = text.render("Notes:", True, font_color)
+            note_rect = note.get_rect(center=(background_rect.centerx, background_rect.centery + 150))
+
+            text = Font(FONT, int(height / 50))
+            note1 = text.render("    ".join("- use the mouse to control the paddle".split()),
+                                True, font_color)
+            note1_rect = note1.get_rect(
+                midleft=(score_rect.left, note_rect.centery + note_rect.height + text.get_height()))
+
+            note2 = text.render("    ".join("- press SPACE to restart the game".split()),
+                                True, font_color)
+            note2_rect = note2.get_rect(midleft=(note1_rect.left, note1_rect.centery + 2 * note1_rect.height))
+
+            self._display.blit(background, background_rect)
+            self._display.blit(score, score_rect)
+            self._display.blit(end, end_rect)
+            self._display.blit(note, note_rect)
+            self._display.blit(note1, note1_rect)
+            self._display.blit(note2, note2_rect)
+
+        pg.display.flip()
+        self._clock.tick(self._fps)
 
     def on_cleanup(self):
         """

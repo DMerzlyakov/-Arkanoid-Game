@@ -12,18 +12,15 @@ class Block(Sprite):
     """
     sprites: [str] = BLOCK_SPRITES  # спрайты для блоков с различным количеством hp
 
-
-    # effect = None
     health: int = None  # hp блока
     sprite: str = None  # путь к спрайту
     image: Surface = None  # поверхность, на которой отрисован блок
     rect: Rect = None  # объект с размерами и координатами поверхности
 
     def __init__(self, x: float, y: float, width: int, height: int,
-                 heath: int = None, effect=None, *groups: Group):
+                 heath: int = None, *groups: Group):
 
         super(Block, self).__init__(*groups)
-        self.effect = effect
         self.health = heath or random.randint(1, len(self.sprites))
         self.sprite = self.sprites[self.health - 1]
 

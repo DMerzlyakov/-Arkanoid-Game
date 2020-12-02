@@ -4,6 +4,7 @@ from pygame.sprite import Sprite, Group
 
 from settings import WIDTH, BALL_SPRITE
 
+
 class Ball(Sprite):
     """
     Создает объект шарика
@@ -25,7 +26,7 @@ class Ball(Sprite):
         self.dx = 1
         self.dy = -1
         self.acc = 0.02
-        self.image = pg.transform.scale(pg.image.load(self.sprite), (2 * radius, 2 * radius)).convert()
+        self.image = pg.transform.scale(pg.image.load(self.sprite), (int(2 * radius), int(2 * radius))).convert()
         self.rect = self.image.get_rect(center=(x, y))
 
     def _collide_with(self, sprite: Sprite):
@@ -87,7 +88,7 @@ class Ball(Sprite):
 
         return paddle_collision, block_collision, dropped
 
-    def update(self, paddle: Sprite, blocks: Group) -> (int, int, bool):
+    def update(self, paddle: Sprite, blocks: Group) -> tuple[int, int, bool]:
         paddle_collision, block_collision, dropped = self._collide(paddle, blocks)
         self.rect.centerx += self.speed * self.dx
         self.rect.centery += self.speed * self.dy
@@ -95,5 +96,4 @@ class Ball(Sprite):
 
     def draw(self, surface: Surface):
         # пока используется круг для изоображения шарика
-        # pg.draw.circle(surface, self.color, (self.rect.centerx, self.rect.centery), self.rect.height / 2)
         surface.blit(self.image, self.rect)
